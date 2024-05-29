@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://our.property.com/propertySearch.schema.json",
+    "type": "object",
+    "properties": {
+        "location": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+        },
+        "checkin": {
+            "type": "string",
+            "format": "date"
+        },
+        "checkout": {
+            "type": "string",
+            "format": "date"
+        },
+        "adults": {
+            "type": "number",
+            "minimum": 1
+        },
+        "bedrooms": {
+            "type": "number",
+            "minimum": 1
+        },
+        "bathrooms": {
+            "type": "number",
+            "minimum": 1
+        },
+        "property_type": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "location",
+        "checkin",
+        "checkout",
+        "adults"
+    ]
+}

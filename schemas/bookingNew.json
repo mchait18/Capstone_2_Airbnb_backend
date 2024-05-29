@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://our.property.com/propertySearch.schema.json",
+    "type": "object",
+    "properties": {
+        "checkin": {
+            "type": "string",
+            "format": "date"
+        },
+        "checkout": {
+            "type": "string",
+            "format": "date"
+        },
+        "adults": {
+            "type": "number",
+            "minimum": 1
+        },
+        "propertyId": {
+            "type": "string"
+        },
+        "price": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "propertyId",
+        "checkin",
+        "checkout",
+        "adults"
+    ]
+}

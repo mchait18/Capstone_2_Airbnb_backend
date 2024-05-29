@@ -9,6 +9,7 @@
 CREATE TABLE "properties" (
     "property_id" int   NOT NULL,
     "title" string   NOT NULL,
+    "city" string NOT NULL,
     "host_id" int   NOT NULL,
     "host_name" string   NOT NULL,
     "host_photo" string   NOT NULL,

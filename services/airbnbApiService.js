@@ -5,25 +5,20 @@ const axios = require("axios");
 const { API_SECRET_KEY } = require("../config");
 
 class AirbnbApiService {
-    static async searchProperties(
-        location = "United States",
-        category = "all",
-        adults = 1,
-        checkin = "2024-05-13",
-        checkout = "2024-05-20",
-        priceMin = 0,
-        priceMax = 100000,
-        minBedrooms = 0,
-        minBeds = 0,
-        minBathrooms = 0,
+    static async searchProperties({ location, adults, checkin, checkout }
+        // priceMin = 0,
+        // priceMax = 100000,
+        // minBedrooms = 0,
+        // minBeds = 0,
+        // minBathrooms = 0,
         // property_type = ["all"]
     ) {
         const response = await axios({
             url: `${BASE_URL}/v1/searchPropertyByLocationV2`,
             method: "GET",
             params: {
-                location, category, adults, checkin, checkout, priceMin,
-                priceMax, minBedrooms, minBeds, minBathrooms,
+                location, adults, checkin, checkout
+                // , priceMin, priceMax, minBedrooms, minBeds, minBathrooms,
                 // property_type
             },
             headers: { 'X-RapidAPI-Key': API_SECRET_KEY }
@@ -70,7 +65,6 @@ class AirbnbApiService {
             params: { propertyId, checkIn, checkOut, adults },
             headers: { 'X-RapidAPI-Key': API_SECRET_KEY }
         });
-        console.log("in BookingPrice, response is ", response)
         return response.data
     }
 }

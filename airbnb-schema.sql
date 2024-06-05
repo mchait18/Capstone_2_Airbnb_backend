@@ -7,50 +7,56 @@
 -- two dots ('..' - without quotes).
 
 CREATE TABLE "properties" (
-    "property_id" int   NOT NULL,
-    "title" string   NOT NULL,
-    "city" string NOT NULL,
-    "host_id" int   NOT NULL,
-    "host_name" string   NOT NULL,
-    "host_photo" string   NOT NULL,
-    "image_url" string   NOT NULL,
+    "property_id" TEXT   NOT NULL,
+    "title" TEXT   NOT NULL,
+    "city" TEXT NOT NULL,
+    "host_id" TEXT   NOT NULL,
+    "host_name" TEXT   NOT NULL,
+    "host_photo" TEXT   NOT NULL,
+    "image_url" TEXT   NOT NULL,
     "adults" int   NOT NULL,
     "reviews_count" int   NOT NULL,
-    "name" string   NOT NULL,
-    "property_type" string   NOT NULL,
+    "name" TEXT   NOT NULL,
+    "property_type" TEXT   NOT NULL,
     CONSTRAINT "pk_properties" PRIMARY KEY (
         "property_id"
      )
 );
 
-CREATE TABLE "booking" (
-    "id" int   NOT NULL,
-    "guest_id" int   NOT NULL,
-    "property_id" int   NOT NULL,
-    "checkin" date   NOT NULL,
-    "checkout" date   NOT NULL,
-    "price" float   NOT NULL,
-    CONSTRAINT "pk_booking" PRIMARY KEY (
+CREATE TABLE "bookings" (
+    "id" TEXT   NOT NULL,
+    "guest_id" TEXT   NOT NULL,
+    "property_id" TEXT   NOT NULL,
+    "check_in" date   NOT NULL,
+    "check_out" date   NOT NULL,
+    "price_title" TEXT   NOT NULL,
+    "cleaning_fee" TEXT   NOT NULL,
+    "total_price" TEXT   NOT NULL,
+    "image_url" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "host" TEXT NOT NULL,
+     CONSTRAINT "pk_bookings" PRIMARY KEY (
         "id"
      )
 );
 
 CREATE TABLE "users" (
-    "id" int   NOT NULL,
-    "email" string   NOT NULL,
-    "first_name" string   NOT NULL,
-    "last_name" string   NOT NULL,
-    "username" string   NOT NULL,
+    "id" TEXT   NOT NULL,
+    "email" TEXT   NOT NULL,
+    "first_name" TEXT   NOT NULL,
+    "last_name" TEXT   NOT NULL,
+    "username" TEXT   NOT NULL,
     "password" text   NOT NULL,
+    "is_owner" boolean NOT NULL,
     CONSTRAINT "pk_users" PRIMARY KEY (
         "id"
      )
 );
 
 CREATE TABLE "amenities" (
-    "id" int   NOT NULL,
+    "id" TEXT   NOT NULL,
     -- indoor, outdoor, area, water, kosher
-    "type" string   NOT NULL,
+    "type" TEXT   NOT NULL,
     "name" text   NOT NULL,
     CONSTRAINT "pk_amenities" PRIMARY KEY (
         "id"
@@ -58,37 +64,37 @@ CREATE TABLE "amenities" (
 );
 
 CREATE TABLE "house_amenities" (
-    "property" int   NOT NULL,
-    "amenities_id" int   NOT NULL
+    "property" TEXT   NOT NULL,
+    "amenities_id" TEXT   NOT NULL
 );
 
 CREATE TABLE "available_dates" (
-    "property_id" int   NOT NULL,
+    "property_id" TEXT   NOT NULL,
     "start_date" date   NOT NULL,
     "end_date" date   NOT NULL
 );
 
 CREATE TABLE "images" (
-    "id" int   NOT NULL,
-    "property_id" int   NOT NULL,
-    "image_url" string   NOT NULL,
+    "id" TEXT   NOT NULL,
+    "property_id" TEXT   NOT NULL,
+    "image_url" TEXT   NOT NULL,
     CONSTRAINT "pk_images" PRIMARY KEY (
         "id"
      )
 );
 
 CREATE TABLE "favorites" (
-    "user_id" int   NOT NULL,
-    "property_id" int   NOT NULL
+    "user_id" TEXT   NOT NULL,
+    "property_id" TEXT   NOT NULL
 );
 
 CREATE TABLE "reviews" (
-    "id" int   NOT NULL,
-    "property_id" int   NOT NULL,
-    "first_name" string   NOT NULL,
-    "profile_picture" string   NOT NULL,
+    "id" TEXT   NOT NULL,
+    "property_id" TEXT   NOT NULL,
+    "first_name" TEXT   NOT NULL,
+    "profile_picture" TEXT   NOT NULL,
     "rating" int   NOT NULL,
-    "comments" string   NOT NULL,
+    "comments" TEXT   NOT NULL,
     CONSTRAINT "pk_reviews" PRIMARY KEY (
         "id"
      )
@@ -97,11 +103,8 @@ CREATE TABLE "reviews" (
 ALTER TABLE "properties" ADD CONSTRAINT "fk_properties_host_id" FOREIGN KEY("host_id")
 REFERENCES "users" ("id");
 
-ALTER TABLE "booking" ADD CONSTRAINT "fk_booking_guest_id" FOREIGN KEY("guest_id")
+ALTER TABLE "bookings" ADD CONSTRAINT "fk_bookings_guest_id" FOREIGN KEY("guest_id")
 REFERENCES "users" ("id");
-
-ALTER TABLE "booking" ADD CONSTRAINT "fk_booking_property_id" FOREIGN KEY("property_id")
-REFERENCES "properties" ("property_id");
 
 ALTER TABLE "house_amenities" ADD CONSTRAINT "fk_house_amenities_property" FOREIGN KEY("property")
 REFERENCES "properties" ("property_id");

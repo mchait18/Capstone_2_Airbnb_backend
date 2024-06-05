@@ -3,12 +3,6 @@
     "$id": "http://our.property.com/propertySearch.schema.json",
     "type": "object",
     "properties": {
-        "bookingId": {
-            "type": "string"
-        },
-        "userId": {
-            "type": "string"
-        },
         "checkIn": {
             "type": "string",
             "format": "date"
@@ -22,24 +16,6 @@
             "minimum": 1
         },
         "propertyId": {
-            "type": "string"
-        },
-        "priceTitle": {
-            "type": "string"
-        },
-        "cleaningFee": {
-            "type": "string"
-        },
-        "totalPrice": {
-            "type": "string"
-        },
-        "imageUrl": {
-            "type": "string"
-        },
-        "host": {
-            "type": "string"
-        },
-        "location": {
             "type": "string"
         }
     },

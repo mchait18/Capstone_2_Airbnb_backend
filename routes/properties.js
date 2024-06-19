@@ -6,13 +6,16 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError, ExpressError } = require("../expressError");
-const { ensureOwner } = require("../middleware/auth");
+const { ensureOwner, ensureCorrectUser } = require("../middleware/auth");
 const Property = require("../models/property");
 
 // const propertyNewSchema = require("../schemas/propertyNew.json");
 // const propertyUpdateSchema = require("../schemas/propertyUpdate.json");
 const propertySearchSchema = require("../schemas/propertySearch.json");
 const AirbnbApiService = require("../services/airbnbApiService")
+const { SECRET_KEY } = require("../config");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
 const router = new express.Router();
 
@@ -61,6 +64,7 @@ router.get("/", async function (req, res, next) {
   try {
     const searchTerms = req.query
     searchTerms.adults = +searchTerms.adults
+    searchTerms.location = searchTerms.location.toLowerCase()
     const validator = jsonschema.validate(searchTerms, propertySearchSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
@@ -91,14 +95,38 @@ router.get("/:propertyId", async function (req, res, next) {
 
 router.get("/reviews/:propertyId", async function (req, res, next) {
   try {
-    console.log("in route, get propreviews")
     const reviews = await AirbnbApiService.getPropertyReviews(req.params.propertyId)
-    console.log("in route, reviews is ", reviews)
     return res.json({ reviews });
   } catch (err) {
     return next(err);
   }
 });
+//get user favorites
+router.get("/favorites/:token", async function (req, res, next) {
+  try {
+    const token = req.params.token
+    const user = jwt.verify(token, SECRET_KEY);
+    const userRes = await User.get(user.username)
+    const favorites = await Property.getFavorites(userRes.id)
+    return res.json({ favorites });
+  } catch (err) {
+    return next(err);
+  }
+});
+//add/remove a favorite
+router.post("/favorites/:token", ensureCorrectUser, async function (req, res, next) {
+  try {
+    const token = req.params.token
+    const localUser = jwt.verify(token, SECRET_KEY);
+    const user = await User.get(localUser.username)
+    const { propertyId, propertyName, rating, title, imageUrl } = req.body
+    await Property.toggleFavorite(user.id, propertyId, propertyName, rating, title, imageUrl);
+    // return res.json({ applied: jobId });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 
 /** PATCH /[id] {  } => { property }
  *

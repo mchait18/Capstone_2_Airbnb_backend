@@ -16,7 +16,7 @@ class Property {
    * Throws BadRequestError if property already in database.
    * */
 
-  static async create({  }) {
+  static async create({ }) {
     const duplicateCheck = await db.query(
       `SELECT handle
            FROM companies
@@ -43,9 +43,9 @@ class Property {
 
     return company;
   }
-  
+
   static async get(id) {
- 
+
     data = res.json()
     const propertyRes = await db.query(
       `SELECT handle,
@@ -78,6 +78,53 @@ class Property {
     }
     return company;
   }
+  //getFavorites
+  static async getFavorites(userId) {
+
+    const favoriteRes = await db.query(
+      `SELECT property_id AS "propertyId",
+              property_name AS "propertyName",
+              image_url AS "imageUrl",
+              rating,
+              title
+      FROM favorites
+      WHERE user_id = $1`,
+      [userId]);
+
+    const favorites = favoriteRes.rows;
+
+    if (!favorites) throw new NotFoundError(`No favorites`);
+
+    return favorites;
+  }
+
+  //add/remove Favorite
+  static async toggleFavorite(userId, propertyId, propertyName, rating, title, imageUrl) {
+    const favoriteCheck = await db.query(
+      `SELECT user_id, property_id
+           FROM favorites
+           WHERE user_id = $1 AND property_id= $2`,
+      [userId, propertyId]);
+    console.log("property_id is ", propertyId, "userID is ", userId)
+    if (favoriteCheck.rows[0]) {
+      await db.query(
+        `DELETE 
+         FROM favorites
+         WHERE user_id = $1 
+         AND property_id= $2`,
+        [userId, propertyId],
+      );
+    }
+    else {
+      await db.query(
+        `INSERT INTO favorites
+           (user_id, property_id, property_name, rating, title, image_url)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+        [userId, propertyId, propertyName, rating, title, imageUrl],
+      );
+    }
+  }
+
 
   /** Update company data with `data`.
    *

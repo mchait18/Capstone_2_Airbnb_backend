@@ -30,7 +30,7 @@ CREATE TABLE "bookings" (
     "check_in" date   NOT NULL,
     "check_out" date   NOT NULL,
     "price_title" TEXT   NOT NULL,
-    "cleaning_fee" TEXT   NOT NULL,
+    "cleaning_fee" TEXT,
     "total_price" TEXT   NOT NULL,
     "image_url" TEXT NOT NULL,
     "location" TEXT NOT NULL,
@@ -85,7 +85,11 @@ CREATE TABLE "images" (
 
 CREATE TABLE "favorites" (
     "user_id" TEXT   NOT NULL,
-    "property_id" TEXT   NOT NULL
+    "property_id" TEXT   NOT NULL, 
+    "property_name" TEXT NOT NULL,
+    "rating" TEXT,
+    "title" TEXT,
+    "image_url" TEXT
 );
 
 CREATE TABLE "reviews" (
@@ -121,8 +125,8 @@ REFERENCES "properties" ("property_id");
 ALTER TABLE "favorites" ADD CONSTRAINT "fk_favorites_user_id" FOREIGN KEY("user_id")
 REFERENCES "users" ("id");
 
-ALTER TABLE "favorites" ADD CONSTRAINT "fk_favorites_property_id" FOREIGN KEY("property_id")
-REFERENCES "properties" ("property_id");
+-- ALTER TABLE "favorites" ADD CONSTRAINT "fk_favorites_property_id" FOREIGN KEY("property_id")
+-- REFERENCES "properties" ("property_id");
 
 ALTER TABLE "reviews" ADD CONSTRAINT "fk_reviews_property_id" FOREIGN KEY("property_id")
 REFERENCES "properties" ("property_id");

@@ -1,0 +1,61 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://our.property.com/propertyNew.schema.json",
+    "type": "object",
+    "properties": {
+        "propertyId": {
+            "type": "string"
+        },
+        "propertyName": {
+            "type": "string"
+        },
+        "title": {
+            "type": "string"
+        },
+        "imageUrl": {
+            "type": "string"
+        },
+        "adults": {
+            "type": "number",
+            "minimum": 1
+        },
+        "reviewsCount": {
+            "type": "number"
+        },
+        "hostId": {
+            "type": "string"
+        },
+        "hostName": {
+            "type": "string"
+        },
+        "hostPhoto": {
+            "type": "string"
+        },
+        "pricePerNight": {
+            "type": "string"
+        },
+        "rating": {
+            "type": "number"
+        },
+        "city": {
+            "type": "string"
+        },
+        "propertyType": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "propertyId",
+        "propertyName",
+        "title",
+        "imageUrl",
+        "adults",
+        "city",
+        "hostId",
+        "hostName",
+        "pricePerNight",
+        "propertyType",
+        "hostPhoto"
+    ]
+}

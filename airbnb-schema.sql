@@ -14,9 +14,11 @@ CREATE TABLE "properties" (
     "host_name" TEXT   NOT NULL,
     "host_photo" TEXT   NOT NULL,
     "image_url" TEXT   NOT NULL,
-    "adults" int   NOT NULL,
-    "reviews_count" int   NOT NULL,
-    "name" TEXT   NOT NULL,
+    "adults" INT   NOT NULL,
+    "reviews_count" INT,
+    "property_name" TEXT   NOT NULL,
+    "price_per_night" numeric  NOT NULL,
+    "rating" INT ,
     "property_type" TEXT   NOT NULL,
     CONSTRAINT "pk_properties" PRIMARY KEY (
         "property_id"
@@ -70,8 +72,8 @@ CREATE TABLE "house_amenities" (
 
 CREATE TABLE "available_dates" (
     "property_id" TEXT   NOT NULL,
-    "start_date" date   NOT NULL,
-    "end_date" date   NOT NULL
+    "date" date   NOT NULL,
+    "is_available" boolean   NOT NULL
 );
 
 CREATE TABLE "images" (

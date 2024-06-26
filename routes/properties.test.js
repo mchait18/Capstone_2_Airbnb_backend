@@ -1,280 +1,154 @@
-// "use strict";
+"use strict";
 
-// const db = require("../db.js");
-// const { ExpressError, BadRequestError, NotFoundError } = require("../expressError.js");
-// const Company = require("./company.js");
-// const {
-//   commonBeforeAll,
-//   commonBeforeEach,
-//   commonAfterEach,
-//   commonAfterAll,
-// } = require("./_testCommon");
+const request = require("supertest");
 
-// beforeAll(commonBeforeAll);
-// beforeEach(commonBeforeEach);
-// afterEach(commonAfterEach);
-// afterAll(commonAfterAll);
+const app = require("../app");
 
-// /************************************** create */
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterEach,
+  commonAfterAll,
+  u1Token,
+  u2Token,
+  u3Token
+} = require("./_testCommon");
 
-// describe("create", function () {
-//   const newCompany = {
-//     handle: "new",
-//     name: "New",
-//     description: "New Description",
-//     numEmployees: 1,
-//     logoUrl: "http://new.img",
-//   };
+beforeAll(commonBeforeAll);
+beforeEach(commonBeforeEach);
+afterEach(commonAfterEach);
+afterAll(commonAfterAll);
 
-//   test("works", async function () {
-//     let company = await Company.create(newCompany);
-//     expect(company).toEqual(newCompany);
+/************************************** POST /companies */
 
-//     const result = await db.query(
-//       `SELECT handle, name, description, num_employees, logo_url
-//            FROM companies
-//            WHERE handle = 'new'`);
-//     expect(result.rows).toEqual([
-//       {
-//         handle: "new",
-//         name: "New",
-//         description: "New Description",
-//         num_employees: 1,
-//         logo_url: "http://new.img",
-//       },
-//     ]);
-//   });
+describe("POST /properties", function () {
+  const newProperty = {
+    propertyId: 'testId',
+    propertyName: 'pName',
+    title: 'ptitle',
+    imageUrl: 'pImage',
+    reviewsCount: '10',
+    hostId: 'u1Id',
+    hostName: 'hn1',
+    hostPhoto: 'h1Photo',
+    adults: 1,
+    pricePerNight: 100,
+    rating: 5,
+    city: 'pCity',
+    propertyType: 'pType'
+  };
 
-//   test("bad request with dupe", async function () {
-//     try {
-//       await Company.create(newCompany);
-//       await Company.create(newCompany);
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof BadRequestError).toBeTruthy();
-//     }
-//   });
-// });
+  test("ok for owner", async function () {
+    const resp = await request(app)
+      .post("/properties")
+      .send(newProperty)
+      .set("Authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(201);
+    expect(resp.body).toEqual({
+      property: newProperty,
+    });
+  });
 
-// /************************************** findAll */
+  test("unauth for non-admin", async function () {
+    const resp = await request(app)
+      .post("/properties")
+      .send(newProperty)
+      .set("authorization", `Bearer ${u3Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
 
-// describe("findAll", function () {
-//   test("works: no filter", async function () {
-//     let companies = await Company.findAll({});
-//     expect(companies).toEqual([
-//       {
-//         handle: "c1",
-//         name: "C1",
-//         description: "Desc1",
-//         numEmployees: 1,
-//         logoUrl: "http://c1.img",
-//       },
-//       {
-//         handle: "c2",
-//         name: "C2",
-//         description: "Desc2",
-//         numEmployees: 2,
-//         logoUrl: "http://c2.img",
-//       },
-//       {
-//         handle: "c3",
-//         name: "C3",
-//         description: "Desc3",
-//         numEmployees: 3,
-//         logoUrl: "http://c3.img",
-//       },
-//     ]);
-//   });
-//   test("works: only 1 filter", async function () {
-//     let companies = await Company.findAll({ name: "C1" });
-//     expect(companies).toContainEqual(
-//       {
-//         handle: "c1",
-//         name: "C1",
-//         description: "Desc1",
-//         numEmployees: 1,
-//         logoUrl: "http://c1.img",
-//       }
-//     );
-//   }); test("works: 2 filters", async function () {
-//     let companies = await Company.findAll({ name: "c", minEmployees: 2 });
-//     expect(companies).toEqual([
-//       {
-//         handle: "c2",
-//         name: "C2",
-//         description: "Desc2",
-//         numEmployees: 2,
-//         logoUrl: "http://c2.img",
-//       },
-//       {
-//         handle: "c3",
-//         name: "C3",
-//         description: "Desc3",
-//         numEmployees: 3,
-//         logoUrl: "http://c3.img",
-//       },
-//     ]);
-//   });
-//   test("works: all 3 filters", async function () {
-//     let companies = await Company.findAll({ name: "c", minEmployees: 1, maxEmployees: 2 });
-//     expect(companies).toEqual([
-//       {
-//         handle: "c1",
-//         name: "C1",
-//         description: "Desc1",
-//         numEmployees: 1,
-//         logoUrl: "http://c1.img",
-//       },
-//       {
-//         handle: "c2",
-//         name: "C2",
-//         description: "Desc2",
-//         numEmployees: 2,
-//         logoUrl: "http://c2.img",
-//       }
-//     ]);
-//   });
+  test("bad request with missing data", async function () {
+    const resp = await request(app)
+      .post("/properties")
+      .send({
+        propertyId: "new",
+        reviewsCount: 10,
+      })
+      .set("authorization", `Bearer ${u3Token}`);
+    expect(resp.statusCode).toEqual(400);
+  });
 
-//   test("throws error when minEmployees is greater than maxEmployees", async function () {
-//     try {
-//       let companies = await Company.findAll({ minEmployees: 3, maxEmployees: 2 });
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof BadRequestError).toBeTruthy();
-//     }
-//   });
-// });
+  test("bad request with invalid data", async function () {
+    const resp = await request(app)
+      .post("/properties")
+      .send({
+        ...newProperty,
+        imageUrl: "not-a-url",
+      })
+      .set("authorization", `Bearer ${u3Token}`);
+    expect(resp.statusCode).toEqual(400);
+  });
+});
 
-// /************************************** get */
+/************************************** GET /companies */
 
-// describe("get", function () {
-//   test("works", async function () {
-//     let company = await Company.get("c1");
-//     expect(company).toEqual({
-//       handle: "c1",
-//       name: "C1",
-//       description: "Desc1",
-//       numEmployees: 1,
-//       logoUrl: "http://c1.img",
-//       jobs: [{
-//         id: 1,
-//         title: 'j1',
-//         salary: 60000,
-//         equity: "0",
-//         companyHandle: 'c1'
-//       },
-//       {
-//         id: 2,
-//         title: 'j2',
-//         salary: 100000,
-//         equity: "0.5",
-//         companyHandle: 'c1'
-//       }]
-//     });
-//   });
+describe("GET /properties/listings/:token", function () {
+  test("ok for anon", async function () {
+    const resp = await request(app).get(`/properties/listings/${u1Token}`);
+    expect(resp.body).toEqual({
+      properties:
+        [
+          {
+            propertyId: "p1id",
+            propertyName: "p1Name",
+            title: "p1title",
+            imageUrl: 'http://c1.img',
+            adults: 1,
+            reviewsCount: '10',
+            hostId: "u1Id",
+            hostName: "hn1",
+            hostPhoto: 'http://h1.img',
+            pricePerNight: 100,
+            rating: 5,
+            city: "p1City",
+            propertyType: "p1Type"
+          },
+          {
+            propertyId: "p2id",
+            propertyName: "p2Name",
+            title: "p2title",
+            imageUrl: 'http://c2.img',
+            adults: 2,
+            reviewsCount: 20,
+            hostId: "u1Id",
+            hostName: "hn1",
+            hostPhoto: 'http://h2.img',
+            pricePerNight: 200,
+            rating: 5,
+            city: "p2City",
+            propertyType: "p2Type"
+          }
+        ],
+    });
+  });
+});
 
-//   test("not found if no such company", async function () {
-//     try {
-//       await Company.get("nope");
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-// });
+/************************************** GET /properties/:propertyId */
 
-// /************************************** update */
+describe("GET /properties/listing/:propertyId", function () {
+  test("works for anon", async function () {
+    const resp = await request(app).get(`/properties/p1id`);
+    expect(resp.body).toEqual({
+      propertyId: 'p1id',
+      propertyName: 'p1Name',
+      title: 'p1title',
+      imageUrl: 'http://c1.img',
+      reviewsCount: '10',
+      hostId: 'u1Id',
+      hostName: 'hn1',
+      hostPhoto: 'http://h1.img',
+      adults: 1,
+      pricePerNight: 100,
+      rating: 5,
+      city: 'p1City',
+      propertyType: 'p1Type'
+    });
+  });
 
-// describe("update", function () {
-//   const updateData = {
-//     name: "New",
-//     description: "New Description",
-//     numEmployees: 10,
-//     logoUrl: "http://new.img",
-//   };
+  test("not found for no such property", async function () {
+    const resp = await request(app).get(`/properties/listing/nope`);
+    expect(resp.statusCode).toEqual(404);
+  });
+});
 
-//   test("works", async function () {
-//     let company = await Company.update("c1", updateData);
-//     expect(company).toEqual({
-//       handle: "c1",
-//       ...updateData,
-//     });
 
-//     const result = await db.query(
-//       `SELECT handle, name, description, num_employees, logo_url
-//            FROM companies
-//            WHERE handle = 'c1'`);
-//     expect(result.rows).toEqual([{
-//       handle: "c1",
-//       name: "New",
-//       description: "New Description",
-//       num_employees: 10,
-//       logo_url: "http://new.img",
-//     }]);
-//   });
-
-//   test("works: null fields", async function () {
-//     const updateDataSetNulls = {
-//       name: "New",
-//       description: "New Description",
-//       numEmployees: null,
-//       logoUrl: null,
-//     };
-
-//     let company = await Company.update("c1", updateDataSetNulls);
-//     expect(company).toEqual({
-//       handle: "c1",
-//       ...updateDataSetNulls,
-//     });
-
-//     const result = await db.query(
-//       `SELECT handle, name, description, num_employees, logo_url
-//            FROM companies
-//            WHERE handle = 'c1'`);
-//     expect(result.rows).toEqual([{
-//       handle: "c1",
-//       name: "New",
-//       description: "New Description",
-//       num_employees: null,
-//       logo_url: null,
-//     }]);
-//   });
-
-//   test("not found if no such company", async function () {
-//     try {
-//       await Company.update("nope", updateData);
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-
-//   test("bad request with no data", async function () {
-//     try {
-//       await Company.update("c1", {});
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof BadRequestError).toBeTruthy();
-//     }
-//   });
-// });
-
-// /************************************** remove */
-
-// describe("remove", function () {
-//   test("works", async function () {
-//     await Company.remove("c1");
-//     const res = await db.query(
-//       "SELECT handle FROM companies WHERE handle='c1'");
-//     expect(res.rows.length).toEqual(0);
-//   });
-
-//   test("not found if no such company", async function () {
-//     try {
-//       await Company.remove("nope");
-//       fail();
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-// });

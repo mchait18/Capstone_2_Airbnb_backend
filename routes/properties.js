@@ -119,6 +119,21 @@ router.get("/listing/:propertyId", ensureOwner, async function (req, res, next) 
     return next(err);
   }
 });
+//delete listing
+/** DELETE /[id]  =>  { deleted: id }
+ *
+ * Authorization: login
+ */
+
+router.delete("/listing/:propertyId", ensureOwner, async function (req, res, next) {
+  try {
+    await Property.remove(req.params.propertyId);
+    return res.json({ deleted: req.params.propertyId });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 router.get("/reviews/:propertyId", async function (req, res, next) {
   try {
     const reviews = await AirbnbApiService.getPropertyReviews(req.params.propertyId)
@@ -154,45 +169,6 @@ router.post("/favorites/:token", ensureCorrectUser, async function (req, res, ne
 });
 
 
-/** PATCH /[id] {  } => { property }
- *
- * Patches property data.
- *
- * fields can be: {}
- *
- * Returns {  }
- *
- * Authorization required: login
- */
-
-router.patch("/:propertyId", ensureOwner, async function (req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, propertyUpdateSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
-
-    const property = await Property.update(req.params.id, req.body);
-    return res.json({ property });
-  } catch (err) {
-    return next(err);
-  }
-});
-
-/** DELETE /[id]  =>  { deleted: id }
- *
- * Authorization: login
- */
-
-router.delete("/:propertyId", ensureOwner, async function (req, res, next) {
-  try {
-    await Property.remove(req.params.id);
-    return res.json({ deleted: req.params.id });
-  } catch (err) {
-    return next(err);
-  }
-});
 
 
 module.exports = router;

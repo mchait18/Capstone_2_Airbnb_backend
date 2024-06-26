@@ -58,8 +58,8 @@ class User {
    **/
 
   static async register(
-        { id, username, password, firstName, lastName, email, isOwner }) {
-          console.log("in register, isOwner is ", isOwner)
+    { id, username, password, firstName, lastName, email, isOwner }) {
+    // console.log("in register, isOwner is ", isOwner)
     const duplicateCheck = await db.query(
       `SELECT username
            FROM users
@@ -133,7 +133,6 @@ class User {
    * Throws NotFoundError if user not found.
    **/
 
-  //redo jobs part
   static async get(username) {
     const userRes = await db.query(
       `SELECT id, username,
@@ -148,15 +147,6 @@ class User {
 
     const user = userRes.rows[0];
     if (!user) throw new NotFoundError(`No user: ${username}`);
-
-    // const applications = await db.query(
-    //   `SELECT job_id FROM applications
-    //   WHERE username = $1`, [username]
-    // )
-    // const jobs = applications.rows
-    // if (jobs[0])
-    //   user.jobs = jobs.map(d => (d.job_id))
-
     return user;
   }
 
@@ -206,21 +196,6 @@ class User {
 
     delete user.password;
     return user;
-  }
-
-  /** Delete given user from database; returns undefined. */
-
-  static async remove(username) {
-    let result = await db.query(
-      `DELETE
-           FROM users
-           WHERE username = $1
-           RETURNING username`,
-      [username],
-    );
-    const user = result.rows[0];
-
-    if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
 }

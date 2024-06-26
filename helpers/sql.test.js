@@ -1,54 +1,25 @@
-const { BadRequestError } = require("../expressError");
+
 const { sqlForPartialUpdate } = require("./sql");
 
-describe("get sql for partial update", function () {
-    test("works: all fields filled out", function () {
-        const updateData = {
-            firstName: "NewF",
-            lastName: "NewF",
-            email: "new@email.com",
-            isAdmin: true
-        };
-        const { setCols, values } = sqlForPartialUpdate(
-            updateData,
-            {
-                firstName: "first_name",
-                lastName: "last_name",
-                isAdmin: "is_admin"
-            });
-        expect(setCols).toEqual('"first_name"=$1, "last_name"=$2, "email"=$3, "is_admin"=$4');
-        expect(values).toEqual(["NewF", "NewF", "new@email.com", true]);
-    });
 
-    test("works: some fields", function () {
-        const updateData = {
-            firstName: "NewF",
-            isAdmin: true
-        };
-        const { setCols, values } = sqlForPartialUpdate(
-            updateData,
-            {
-                firstName: "first_name",
-                lastName: "last_name",
-                isAdmin: "is_admin",
-            });
-        expect(setCols).toEqual('"first_name"=$1, "is_admin"=$2');
-        expect(values).toEqual(["NewF", true]);
-
+describe("sqlForPartialUpdate", function () {
+  test("works: 1 item", function () {
+    const result = sqlForPartialUpdate(
+        { f1: "v1" },
+        { f1: "f1", fF2: "f2" });
+    expect(result).toEqual({
+      setCols: "\"f1\"=$1",
+      values: ["v1"],
     });
+  });
 
-    test("works: no fields, throws BadRequestError", function () {
-        const updateData = {};
-        try {
-            const { setCols, values } = sqlForPartialUpdate(
-                updateData,
-                {
-                    firstName: "first_name",
-                    lastName: "last_name",
-                    isAdmin: "is_admin",
-                });
-        } catch (err) {
-            expect(err instanceof BadRequestError).toBeTruthy();
-        }
+  test("works: 2 items", function () {
+    const result = sqlForPartialUpdate(
+        { f1: "v1", jsF2: "v2" },
+        { jsF2: "f2" });
+    expect(result).toEqual({
+      setCols: "\"f1\"=$1, \"f2\"=$2",
+      values: ["v1", "v2"],
     });
+  });
 });

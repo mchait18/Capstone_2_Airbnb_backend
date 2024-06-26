@@ -9,14 +9,14 @@ const {
 
 
 const { SECRET_KEY } = require("../config");
-const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
-const badJwt = jwt.sign({ username: "test", isAdmin: false }, "wrong");
+const testJwt = jwt.sign({ username: "test", isOwner: false }, SECRET_KEY);
+const badJwt = jwt.sign({ username: "test", isOwner: false }, "wrong");
 
 
 describe("authenticateJWT", function () {
   test("works: via header", function () {
     expect.assertions(2);
-     //there are multiple ways to pass an authorization token, this is how you pass it in the header.
+    //there are multiple ways to pass an authorization token, this is how you pass it in the header.
     //this has been provided to show you another way to pass the token. you are only expected to read this code for this project.
     const req = { headers: { authorization: `Bearer ${testJwt}` } };
     const res = { locals: {} };
@@ -28,7 +28,7 @@ describe("authenticateJWT", function () {
       user: {
         iat: expect.any(Number),
         username: "test",
-        isAdmin: false,
+        isOwner: false,
       },
     });
   });
@@ -61,7 +61,7 @@ describe("ensureLoggedIn", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { username: "test", is_admin: false } } };
+    const res = { locals: { user: { username: "test", is_owner: false } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };

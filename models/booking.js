@@ -60,6 +60,7 @@ class Booking {
     );
 
     const booking = result.rows[0];
+    console.log("in model, booking is ", booking)
     return booking;
   }
   static async getBookings(userId) {
@@ -102,59 +103,6 @@ class Booking {
     return booking;
   }
 
-  /** Update company data with `data`.
-   *
-   * This is a "partial update" --- it's fine if data doesn't contain all the
-   * fields; this only changes provided ones.
-   *
-   * Data can include: {name, description, numEmployees, logoUrl}
-   *
-   * Returns {handle, name, description, numEmployees, logoUrl}
-   *
-   * Throws NotFoundError if not found.
-   */
-
-  // static async update(handle, data) {
-  //   const { setCols, values } = sqlForPartialUpdate(
-  //     data,
-  //     {
-  //       numEmployees: "num_employees",
-  //       logoUrl: "logo_url",
-  //     });
-  //   const handleVarIdx = "$" + (values.length + 1);
-
-  //   const querySql = `UPDATE companies 
-  //                     SET ${setCols} 
-  //                     WHERE handle = ${handleVarIdx} 
-  //                     RETURNING handle, 
-  //                               name, 
-  //                               description, 
-  //                               num_employees AS "numEmployees", 
-  //                               logo_url AS "logoUrl"`;
-  //   const result = await db.query(querySql, [...values, handle]);
-  //   const company = result.rows[0];
-
-  //   if (!company) throw new NotFoundError(`No company: ${handle}`);
-
-  //   return company;
-  // }
-
-  // /** Delete given company from database; returns undefined.
-  //  *
-  //  * Throws NotFoundError if company not found.
-  //  **/
-
-  // static async remove(handle) {
-  //   const result = await db.query(
-  //     `DELETE
-  //          FROM companies
-  //          WHERE handle = $1
-  //          RETURNING handle`,
-  //     [handle]);
-  //   const company = result.rows[0];
-
-  //   if (!company) throw new NotFoundError(`No company: ${handle}`);
-  // }
 }
 
 

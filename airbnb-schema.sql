@@ -18,7 +18,7 @@ CREATE TABLE "properties" (
     "reviews_count" INT,
     "property_name" TEXT   NOT NULL,
     "price_per_night" numeric  NOT NULL,
-    "rating" INT ,
+    "rating" numeric ,
     "property_type" TEXT   NOT NULL,
     CONSTRAINT "pk_properties" PRIMARY KEY (
         "property_id"

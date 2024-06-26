@@ -179,58 +179,21 @@ class Property {
   }
 
 
-  /** Update company data with `data`.
+  /** Delete given listing from database; returns undefined.
    *
-   * This is a "partial update" --- it's fine if data doesn't contain all the
-   * fields; this only changes provided ones.
-   *
-   * Data can include: {name, description, numEmployees, logoUrl}
-   *
-   * Returns {handle, name, description, numEmployees, logoUrl}
-   *
-   * Throws NotFoundError if not found.
-   */
-
-  static async update(handle, data) {
-    const { setCols, values } = sqlForPartialUpdate(
-      data,
-      {
-        numEmployees: "num_employees",
-        logoUrl: "logo_url",
-      });
-    const handleVarIdx = "$" + (values.length + 1);
-
-    const querySql = `UPDATE companies 
-                      SET ${setCols} 
-                      WHERE handle = ${handleVarIdx} 
-                      RETURNING handle, 
-                                name, 
-                                description, 
-                                num_employees AS "numEmployees", 
-                                logo_url AS "logoUrl"`;
-    const result = await db.query(querySql, [...values, handle]);
-    const company = result.rows[0];
-
-    if (!company) throw new NotFoundError(`No company: ${handle}`);
-
-    return company;
-  }
-
-  /** Delete given company from database; returns undefined.
-   *
-   * Throws NotFoundError if company not found.
+   * Throws NotFoundError if listing not found.
    **/
 
-  static async remove(handle) {
+  static async remove(propertyId) {
     const result = await db.query(
       `DELETE
-           FROM companies
-           WHERE handle = $1
-           RETURNING handle`,
-      [handle]);
-    const company = result.rows[0];
+           FROM properties
+           WHERE property_id = $1
+           RETURNING property_id`,
+      [propertyId]);
+    const property = result.rows[0];
 
-    if (!company) throw new NotFoundError(`No company: ${handle}`);
+    if (!property) throw new NotFoundError(`No property: ${propertyId}`);
   }
 }
 

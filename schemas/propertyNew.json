@@ -13,7 +13,8 @@
             "type": "string"
         },
         "imageUrl": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
         },
         "adults": {
             "type": "number",

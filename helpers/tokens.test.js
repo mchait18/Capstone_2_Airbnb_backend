@@ -3,34 +3,34 @@ const { createToken } = require("./tokens");
 const { SECRET_KEY } = require("../config");
 
 describe("createToken", function () {
-  test("works: not admin", function () {
-    const token = createToken({ username: "test", is_admin: false });
+  test("works: not owner", function () {
+    const token = createToken({ username: "test", isOwner: false });
     const payload = jwt.verify(token, SECRET_KEY);
     expect(payload).toEqual({
       iat: expect.any(Number),
       username: "test",
-      isAdmin: false,
+      isOwner: false,
     });
   });
 
-  test("works: admin", function () {
-    const token = createToken({ username: "test", isAdmin: true });
+  test("works: owner", function () {
+    const token = createToken({ username: "test", isOwner: true });
     const payload = jwt.verify(token, SECRET_KEY);
     expect(payload).toEqual({
       iat: expect.any(Number),
       username: "test",
-      isAdmin: true,
+      isOwner: true,
     });
   });
 
-  test("works: default no admin", function () {
+  test("works: default no owner", function () {
     // given the security risk if this didn't work, checking this specifically
     const token = createToken({ username: "test" });
     const payload = jwt.verify(token, SECRET_KEY);
     expect(payload).toEqual({
       iat: expect.any(Number),
       username: "test",
-      isAdmin: false,
+      isOwner: false,
     });
   });
 });

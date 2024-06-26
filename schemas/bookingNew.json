@@ -34,7 +34,8 @@
             "type": "string"
         },
         "imageUrl": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
         },
         "host": {
             "type": "string"

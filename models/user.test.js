@@ -29,7 +29,7 @@ describe("authenticate", function () {
       firstName: "U1F",
       lastName: "U1L",
       email: "u1@email.com",
-      isAdmin: false,
+      isOwner: true,
     });
   });
 
@@ -56,11 +56,12 @@ describe("authenticate", function () {
 
 describe("register", function () {
   const newUser = {
+    id: "testId",
     username: "new",
     firstName: "Test",
     lastName: "Tester",
     email: "test@test.com",
-    isAdmin: false,
+    isOwner: false,
   };
 
   test("works", async function () {
@@ -71,20 +72,20 @@ describe("register", function () {
     expect(user).toEqual(newUser);
     const found = await db.query("SELECT * FROM users WHERE username = 'new'");
     expect(found.rows.length).toEqual(1);
-    expect(found.rows[0].is_admin).toEqual(false);
+    expect(found.rows[0].is_owner).toEqual(false);
     expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
   });
 
-  test("works: adds admin", async function () {
+  test("works: adds owner", async function () {
     let user = await User.register({
       ...newUser,
       password: "password",
-      isAdmin: true,
+      isOwner: true,
     });
-    expect(user).toEqual({ ...newUser, isAdmin: true });
+    expect(user).toEqual({ ...newUser, isOwner: true });
     const found = await db.query("SELECT * FROM users WHERE username = 'new'");
     expect(found.rows.length).toEqual(1);
-    expect(found.rows[0].is_admin).toEqual(true);
+    expect(found.rows[0].is_owner).toEqual(true);
     expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
   });
 
@@ -112,18 +113,18 @@ describe("findAll", function () {
     const users = await User.findAll();
     expect(users).toEqual([
       {
-        username: "u1",
+                username: "u1",
         firstName: "U1F",
         lastName: "U1L",
         email: "u1@email.com",
-        isAdmin: false,
+        isOwner: true,
       },
       {
-        username: "u2",
+               username: "u2",
         firstName: "U2F",
         lastName: "U2L",
         email: "u2@email.com",
-        isAdmin: false,
+        isOwner: false,
       },
     ]);
   });
@@ -135,12 +136,12 @@ describe("get", function () {
   test("works", async function () {
     let user = await User.get("u1");
     expect(user).toEqual({
+      id: "id1",
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
       email: "u1@email.com",
-      isAdmin: false,
-      jobs: [1, 2]
+      isOwner: true
     });
   });
 
@@ -162,27 +163,27 @@ describe("update", function () {
     firstName: "NewF",
     lastName: "NewF",
     email: "new@email.com",
-    isAdmin: true,
+    isOwner: false,
   };
 
   test("works", async function () {
-    let job = await User.update("u1", updateData);
-    expect(job).toEqual({
+    let user = await User.update("u1", updateData);
+    expect(user).toEqual({
       username: "u1",
       ...updateData,
     });
   });
 
   test("works: set password", async function () {
-    let job = await User.update("u1", {
+    let user = await User.update("u1", {
       password: "new",
     });
-    expect(job).toEqual({
+    expect(user).toEqual({
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
       email: "u1@email.com",
-      isAdmin: false,
+      isOwner: true
     });
     const found = await db.query("SELECT * FROM users WHERE username = 'u1'");
     expect(found.rows.length).toEqual(1);
@@ -213,58 +214,21 @@ describe("update", function () {
 
 /************************************** remove */
 
-describe("remove", function () {
-  test("works", async function () {
-    await User.remove("u1");
-    const res = await db.query(
-      "SELECT * FROM users WHERE username='u1'");
-    expect(res.rows.length).toEqual(0);
-  });
+// describe("remove", function () {
+//   test("works", async function () {
+//     await User.remove("u1");
+//     const res = await db.query(
+//       "SELECT * FROM users WHERE username='u1'");
+//     expect(res.rows.length).toEqual(0);
+//   });
 
-  test("not found if no such user", async function () {
-    try {
-      await User.remove("nope");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-});
+//   test("not found if no such user", async function () {
+//     try {
+//       await User.remove("nope");
+//       fail();
+//     } catch (err) {
+//       expect(err instanceof NotFoundError).toBeTruthy();
+//     }
+//   });
+// });
 
-describe("apply", function () {
-  test("works", async function () {
-    const result = await db.query(
-      "SELECT * FROM applications WHERE username='u1'");
-    expect(result.rows.length).toEqual(2);
-    await User.apply("u1", 3);
-
-    const res = await db.query(
-      "SELECT * FROM applications WHERE username='u1'");
-    expect(res.rows.length).toEqual(3);
-  });
-
-  test("not found if no such user", async function () {
-    try {
-      await User.apply("nope", 0);
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-  test("not found if no such job", async function () {
-    try {
-      await User.apply("c1", 99999);
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-  test("duplicate job app", async function () {
-    try {
-      await User.apply("u2", 3);
-      fail();
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
-})

@@ -1,19 +1,31 @@
 const { BadRequestError } = require("../expressError");
 
-// THIS function takes a json object with columns to update and 
-//converts them to a string with the sql column names corresponding to a variable like this $1, $2, etc.
+/**
+ * Helper for making selective update queries.
+ *
+ * The calling function can use it to make the SET clause of an SQL UPDATE
+ * statement.
+ *
+ * @param dataToUpdate {Object} {field1: newVal, field2: newVal, ...}
+ * @param jsToSql {Object} maps js-style data fields to database column names,
+ *   like { firstName: "first_name", age: "age" }
+ *
+ * @returns {Object} {sqlSetCols, dataToUpdate}
+ *
+ * @example {firstName: 'Aliya', age: 32} =>
+ *   { setCols: '"first_name"=$1, "age"=$2',
+ *     values: ['Aliya', 32] }
+ */
+
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
-  //extract the column names that need updating
   const keys = Object.keys(dataToUpdate);
-  //if empty, no data to update
   if (keys.length === 0) throw new BadRequestError("No data");
 
-  //changes the column names from the json names to the sql names if they appear in the jsToSql object
-  //{firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
+  // {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
   const cols = keys.map((colName, idx) =>
       `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
-//return an obj with a sql string of columns to update with the sql names and corresponding $nums, and and array with their values
+
   return {
     setCols: cols.join(", "),
     values: Object.values(dataToUpdate),

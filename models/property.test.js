@@ -2,7 +2,7 @@
 
 const db = require("../db.js");
 const { ExpressError, BadRequestError, NotFoundError } = require("../expressError.js");
-const Company = require("./company.js");
+const Property = require("./property.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
@@ -18,37 +18,65 @@ afterAll(commonAfterAll);
 /************************************** create */
 
 describe("create", function () {
-  const newCompany = {
-    handle: "new",
-    name: "New",
-    description: "New Description",
-    numEmployees: 1,
-    logoUrl: "http://new.img",
+  const newProperty = {
+    propertyId: "testId",
+    propertyName: "testProperty",
+    title: "testTitle",
+    imageUrl: "testImg",
+    adults: 1,
+    reviewsCount: 20,
+    hostId: "id2",
+    hostName: "testHostName",
+    hostPhoto: "testHostPhoto",
+    pricePerNight: "100",
+    rating: 5,
+    city: "testCity",
+    propertyType: "testType"
   };
 
   test("works", async function () {
-    let company = await Company.create(newCompany);
-    expect(company).toEqual(newCompany);
+    let property = await Property.create(newProperty);
+    expect(property).toEqual(newProperty);
 
     const result = await db.query(
-      `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'new'`);
+      `SELECT property_id AS "propertyId", 
+           property_name AS "propertyName", 
+           title, 
+           image_url AS "imageUrl", 
+           adults,
+           reviews_count AS "reviewsCount",
+           host_id AS "hostId", 
+           host_name AS "hostName", 
+           host_photo AS "hostPhoto", 
+           price_per_night AS "pricePerNight", 
+           rating, 
+           city, 
+           property_type AS "propertyType"
+    FROM properties
+    WHERE host_id ='id2'`);
     expect(result.rows).toEqual([
       {
-        handle: "new",
-        name: "New",
-        description: "New Description",
-        num_employees: 1,
-        logo_url: "http://new.img",
+        propertyId: "testId",
+        propertyName: "testProperty",
+        title: "testTitle",
+        imageUrl: "testImg",
+        adults: 1,
+        reviewsCount: 20,
+        hostId: "id2",
+        hostName: "testHostName",
+        hostPhoto: "testHostPhoto",
+        pricePerNight: "100",
+        rating: 5,
+        city: "testCity",
+        propertyType: "testType"
       },
     ]);
   });
 
   test("bad request with dupe", async function () {
     try {
-      await Company.create(newCompany);
-      await Company.create(newCompany);
+      await Property.create(newProperty);
+      await Property.create(newProperty);
       fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
@@ -56,126 +84,86 @@ describe("create", function () {
   });
 });
 
-/************************************** findAll */
+/************************************** getListings */
 
-describe("findAll", function () {
-  test("works: no filter", async function () {
-    let companies = await Company.findAll({});
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      },
-      {
-        handle: "c3",
-        name: "C3",
-        description: "Desc3",
-        numEmployees: 3,
-        logoUrl: "http://c3.img",
-      },
-    ]);
-  });
-  test("works: only 1 filter", async function () {
-    let companies = await Company.findAll({ name: "C1" });
-    expect(companies).toContainEqual(
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      }
-    );
-  }); test("works: 2 filters", async function () {
-    let companies = await Company.findAll({ name: "c", minEmployees: 2 });
-    expect(companies).toEqual([
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      },
-      {
-        handle: "c3",
-        name: "C3",
-        description: "Desc3",
-        numEmployees: 3,
-        logoUrl: "http://c3.img",
-      },
-    ]);
-  });
-  test("works: all 3 filters", async function () {
-    let companies = await Company.findAll({ name: "c", minEmployees: 1, maxEmployees: 2 });
-    expect(companies).toEqual([
-      {
-        handle: "c1",
-        name: "C1",
-        description: "Desc1",
-        numEmployees: 1,
-        logoUrl: "http://c1.img",
-      },
-      {
-        handle: "c2",
-        name: "C2",
-        description: "Desc2",
-        numEmployees: 2,
-        logoUrl: "http://c2.img",
-      }
-    ]);
-  });
-
-  test("throws error when minEmployees is greater than maxEmployees", async function () {
-    try {
-      let companies = await Company.findAll({ minEmployees: 3, maxEmployees: 2 });
-      fail();
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
-});
-
-/************************************** get */
-
-describe("get", function () {
+describe("getListings", function () {
   test("works", async function () {
-    let company = await Company.get("c1");
-    expect(company).toEqual({
-      handle: "c1",
-      name: "C1",
-      description: "Desc1",
-      numEmployees: 1,
-      logoUrl: "http://c1.img",
-      jobs: [{
-        id: 1,
-        title: 'j1',
-        salary: 60000,
-        equity: "0",
-        companyHandle: 'c1'
+    let properties = await Property.getListings('id1');
+    expect(properties).toEqual([
+      {
+        propertyId: "P1",
+        propertyName: "P1",
+        title: "T1",
+        imageUrl: 'http://c1.img',
+        adults: 1,
+        reviewsCount: 10,
+        hostId: "id1",
+        hostName: "hn1",
+        hostPhoto: 'http://h1.img',
+        pricePerNight: "100",
+        rating: 5,
+        city: "c1",
+        propertyType: "t1"
       },
       {
-        id: 2,
-        title: 'j2',
-        salary: 100000,
-        equity: "0.5",
-        companyHandle: 'c1'
-      }]
+        propertyId: "P2",
+        propertyName: "P2",
+        title: "T2",
+        imageUrl: 'http://c2.img',
+        adults: 2,
+        reviewsCount: 20,
+        hostId: "id1",
+        hostName: "hn2",
+        hostPhoto: 'http://h2.img',
+        pricePerNight: "200",
+        rating: 5,
+        city: "c2",
+        propertyType: "t2"
+      },
+      {
+        propertyId: "P3",
+        propertyName: "P3",
+        title: "T3",
+        imageUrl: 'http://c3.img',
+        adults: 3,
+        reviewsCount: 30,
+        hostId: "id1",
+        hostName: "hn3",
+        hostPhoto: 'http://h3.img',
+        pricePerNight: "300",
+        rating: 5,
+        city: "c3",
+        propertyType: "t3"
+      },
+    ]);
+  });
+})
+
+/************************************** getListing */
+
+describe("getListing", function () {
+  test("works", async function () {
+    let property = await Property.getListing("P1");
+    expect(property).toEqual({
+      propertyId: "P1",
+      propertyName: "P1",
+      title: "T1",
+      imageUrl: 'http://c1.img',
+      adults: 1,
+      reviewsCount: 10,
+      hostId: "id1",
+      hostName: "hn1",
+      hostPhoto: 'http://h1.img',
+      pricePerNight: "100",
+      rating: 5,
+      city: "c1",
+      propertyType: "t1"
     });
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such Property", async function () {
     try {
-      await Company.get("nope");
+      await Property.getListing("nope");
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
@@ -183,95 +171,20 @@ describe("get", function () {
   });
 });
 
-/************************************** update */
-
-describe("update", function () {
-  const updateData = {
-    name: "New",
-    description: "New Description",
-    numEmployees: 10,
-    logoUrl: "http://new.img",
-  };
-
-  test("works", async function () {
-    let company = await Company.update("c1", updateData);
-    expect(company).toEqual({
-      handle: "c1",
-      ...updateData,
-    });
-
-    const result = await db.query(
-      `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'c1'`);
-    expect(result.rows).toEqual([{
-      handle: "c1",
-      name: "New",
-      description: "New Description",
-      num_employees: 10,
-      logo_url: "http://new.img",
-    }]);
-  });
-
-  test("works: null fields", async function () {
-    const updateDataSetNulls = {
-      name: "New",
-      description: "New Description",
-      numEmployees: null,
-      logoUrl: null,
-    };
-
-    let company = await Company.update("c1", updateDataSetNulls);
-    expect(company).toEqual({
-      handle: "c1",
-      ...updateDataSetNulls,
-    });
-
-    const result = await db.query(
-      `SELECT handle, name, description, num_employees, logo_url
-           FROM companies
-           WHERE handle = 'c1'`);
-    expect(result.rows).toEqual([{
-      handle: "c1",
-      name: "New",
-      description: "New Description",
-      num_employees: null,
-      logo_url: null,
-    }]);
-  });
-
-  test("not found if no such company", async function () {
-    try {
-      await Company.update("nope", updateData);
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-
-  test("bad request with no data", async function () {
-    try {
-      await Company.update("c1", {});
-      fail();
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
-});
 
 /************************************** remove */
 
 describe("remove", function () {
   test("works", async function () {
-    await Company.remove("c1");
+    await Property.remove("P1");
     const res = await db.query(
-      "SELECT handle FROM companies WHERE handle='c1'");
+      "SELECT property_id FROM properties WHERE property_id='P1'");
     expect(res.rows.length).toEqual(0);
   });
 
-  test("not found if no such company", async function () {
+  test("not found if no such property", async function () {
     try {
-      await Company.remove("nope");
+      await Property.remove("nope");
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();

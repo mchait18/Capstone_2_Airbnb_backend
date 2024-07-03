@@ -56,12 +56,7 @@ router.post("/", ensureOwner, async function (req, res, next) {
  * - Location
  * - Check in date
  * - Check out date
- * - Number of guests
- * - bedrooms
- * - bathrooms
- * - property type
- * - price range?
- *
+ *  *
  * Authorization required: none
  */
 
@@ -69,7 +64,6 @@ router.get("/", async function (req, res, next) {
   try {
     const searchTerms = req.query
     searchTerms.adults = +searchTerms.adults
-    // searchTerms.location = searchTerms.location.toLowerCase()
     const validator = jsonschema.validate(searchTerms, propertySearchSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
@@ -143,7 +137,7 @@ router.get("/reviews/:propertyId", async function (req, res, next) {
   }
 });
 //get user favorites
-router.get("/favorites/:token", async function (req, res, next) {
+router.get("/favorites/:token", ensureCorrectUser, async function (req, res, next) {
   try {
     const token = req.params.token
     const user = jwt.verify(token, SECRET_KEY);

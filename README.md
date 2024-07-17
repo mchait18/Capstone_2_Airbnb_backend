@@ -1,4 +1,4 @@
-The title of your site and a link to the URL where it is deployed - Kosher Airbnb
+Airbnb - https://capstone-airbnb-tswo.onrender.com
 This website is a clone of Airbnb. It allows a user to search for properties, based on location, and dates, and then reserve properties. It also allows users to become an owner and post listings.
 The user can favorite the properties he likes and unfavorite them. He can also view his bookings and favorites. The owner can post a listing and view his listings.
 The user can search for properties without being logged in, but if he'd like to reserve, favorite, and view bookings he needs to create a user profile and be logged in. The user can update his profile when logged in as well. The user can only post listings and access his posted listings if he is an owner. 

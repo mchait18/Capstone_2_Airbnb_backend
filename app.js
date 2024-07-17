@@ -12,6 +12,7 @@ const authRoutes = require("./routes/auth");
 const propertiesRoutes = require("./routes/properties");
 const usersRoutes = require("./routes/users");
 const bookingRoutes = require("./routes/bookings");
+const homeRoute = require("./routes/home")
 
 const morgan = require("morgan");
 
@@ -26,7 +27,7 @@ app.use("/auth", authRoutes);
 app.use("/properties", propertiesRoutes);
 app.use("/users", usersRoutes);
 app.use("/bookings", bookingRoutes);
-
+app.use("/", homeRoute)
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {

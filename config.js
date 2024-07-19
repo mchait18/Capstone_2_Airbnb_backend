@@ -7,7 +7,7 @@ require("colors");
 
 
 const SECRET_KEY = process.env.SECRET_KEY || "secret-dev";
-const API_SECRET_KEY = "c55af12b28msh67e524776003382p15df80jsnf0e94cb23438"
+const API_SECRET_KEY = "0365087e67msh565930ba6092b4dp127815jsna9e5eeac6dc7"
 
 const PORT = +process.env.PORT || 3001;
 

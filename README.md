@@ -9,3 +9,9 @@ The user can search for properties without being logged in, but if he'd like to 
 add some notes. I used the API - https://rapidapi.com/DataCrawler/api/airbnb19. If I would expand this project, I would create an API with only Kosher listings, so that it would be relevant to the clientele who seek homes that are kosher.
 
 I used React.js on the front end, with React Bootstrap for design and Node.js and Express on the backend, as well as psql for the database. 
+
+Directions to run this app locally on your machine:
+- Clone the backend repo and frontend repo to your machine
+- Open the backend folder and start the server using nodemon server.js
+- Open the frontend fold and run nmp install, and then start the server using npm start
+
